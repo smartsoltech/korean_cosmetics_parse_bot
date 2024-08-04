@@ -8,6 +8,9 @@ from telegram.ext import (
     CallbackContext,
 )
 import pandas as pd
+import openpyxl
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import Workbook
 import os
 from dotenv import load_dotenv
 
@@ -19,7 +22,7 @@ BOT_USERNAME = os.getenv('BOT_USERNAME')  # Имя пользователя ва
 
 # Configure logging to log to a file
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levellevel)s - %(message)s',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO,
     handlers=[
         logging.FileHandler("bot.log"),
@@ -58,7 +61,19 @@ async def stop_parsing(update: Update, context: CallbackContext) -> None:
     if parsed_data:
         df = pd.DataFrame(parsed_data, columns=['Ссылка', 'Количество', 'Параметр 1', 'Параметр 2', 'Параметр 3', 'Параметр 4', 'Параметр 5'])
         file_path = 'parsed_links.xlsx'
-        df.to_excel(file_path, index=False)
+
+        # Use openpyxl to write the DataFrame to an Excel file with hyperlinks
+        wb = Workbook()
+        ws = wb.active
+        for r in dataframe_to_rows(df, index=False, header=True):
+            ws.append(r)
+        
+        # Apply hyperlink to the first column
+        for cell in ws['A'][1:]:
+            cell.hyperlink = cell.value
+            cell.style = "Hyperlink"
+        
+        wb.save(file_path)
 
         with open(file_path, 'rb') as file:
             await update.message.reply_document(document=file, caption="Вот ваша таблица.")
