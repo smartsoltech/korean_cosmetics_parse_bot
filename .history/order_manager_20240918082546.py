@@ -10,8 +10,6 @@ from shutil import move
 from utility import Utils  # Импортируем новый класс Utils для очистки папок
 import pytz
 
-utils = Utils()
-
 class OrderManager:
     def __init__(self, order_keyboard, file_options_keyboard):
         self.order_keyboard = order_keyboard
@@ -21,8 +19,7 @@ class OrderManager:
         self.income_folder = "/usr/src/app/income"
         self.outcome_folder = "/usr/src/app/outcome"
         self.order_file_path = None  # Путь к файлу заказа
-        
-        
+
         # Создаем папки, если их нет
         if not os.path.exists(self.income_folder):
             os.makedirs(self.income_folder)
@@ -53,17 +50,14 @@ class OrderManager:
         print(f"Файл перемещен в папку outcome: {target_file_path}")
         
     def generate_order_file(self):
-        """Генерация уникального имени для файла заказов с таймштампом."""
-        tz = pytz.timezone('Asia/Seoul')  # Задайте свою временную зону
-        current_time = datetime.now(tz).strftime('%Y-%m-%d_%H-%M-%S')
-        return os.path.join(self.outcome_folder, f"order_{current_time}.xlsx")
+        """Генерация уникального имени для файла заказов."""
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        return os.path.join(self.outcome_folder, f"order_{current_date}.xlsx")
 
     def generate_shipping_filename(self):
-        """Генерация уникального имени для файла shipping с таймштампом."""
-        tz = pytz.timezone('Asia/Seoul')  # Задайте свою временную зону
-        current_time = datetime.now(tz).strftime('%Y-%m-%d_%H-%M-%S')
-        return os.path.join(self.outcome_folder, f"shipping_{current_time}.xlsx")
-
+        """Генерация уникального имени для файла shipping."""
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        return os.path.join(self.outcome_folder, f"shipping_{current_date}.xlsx")
     
     async def generate_shipping_file(self, update: Update, context: CallbackContext):
         """Генерация ТН на основе заказа."""
@@ -79,9 +73,8 @@ class OrderManager:
 
         await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для транспортной компании.")
 
-        # После отправки очищаем папки 'income' и 'outcome'       
-        utils.clear_dirs(self.income_folder)
-        utils.clear_dirs(self.outcome_folder)
+        # Перемещаем файл в папку outcome
+        self.move_file_to_outcome()
 
     async def finalize_order(self, update: Update):
         """Завершение режима заказа и отправка файла с заказом."""
@@ -101,7 +94,7 @@ class OrderManager:
             await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для отправки товаров.")
             
             # После отправки очищаем папки 'income' и 'outcome'
-  
+            utils = Utils()
             utils.clear_dirs(self.income_folder)
             utils.clear_dirs(self.outcome_folder)
 
@@ -245,10 +238,22 @@ class OrderManager:
                 price_str = product_info['Оригинальная цена']
                 price = int(re.sub(r'[^\d]', '', price_str))  # Убираем все символы кроме цифр
                 total += price * row['Количество']
-                
-        utils.clear_dirs(self.income_folder)
-        utils.clear_dirs(self.outcome_folder)
-        
+
         await update.message.reply_text(f"Общая стоимость заказа: {total}₩")
 
- 
+    # async def finalize_order(self, update: Update):
+    #     """Завершение режима заказа и отправка файла с заказом."""
+    #     if self.order_file_path and os.path.exists(self.order_file_path):
+    #         logging.info(f"Завершаем заказ и создаем файлы для отправки: {self.order_file_path}")
+            
+    #         # Создаем файл для транспортной компании
+    #         shipping_file = self.generate_shipping_filename()
+    #         self.create_shipping_file(self.order_file_path)
+
+    #         # Отправляем файл заказов
+    #         await update.message.reply_document(document=open(self.order_file_path, 'rb'), caption="Вот ваш файл заказов.")
+
+    #         # Отправляем файл для транспортной компании
+    #         await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для отправки товаров.")
+    #     else:
+    #         await update.message.reply_text("Файл заказов не найден.")

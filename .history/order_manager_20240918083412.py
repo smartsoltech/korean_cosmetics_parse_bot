@@ -79,7 +79,9 @@ class OrderManager:
 
         await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для транспортной компании.")
 
-        # После отправки очищаем папки 'income' и 'outcome'       
+        # Перемещаем файл в папку outcome
+        # self.move_file_to_outcome()
+        
         utils.clear_dirs(self.income_folder)
         utils.clear_dirs(self.outcome_folder)
 
@@ -245,10 +247,22 @@ class OrderManager:
                 price_str = product_info['Оригинальная цена']
                 price = int(re.sub(r'[^\d]', '', price_str))  # Убираем все символы кроме цифр
                 total += price * row['Количество']
-                
-        utils.clear_dirs(self.income_folder)
-        utils.clear_dirs(self.outcome_folder)
-        
+
         await update.message.reply_text(f"Общая стоимость заказа: {total}₩")
 
- 
+    # async def finalize_order(self, update: Update):
+    #     """Завершение режима заказа и отправка файла с заказом."""
+    #     if self.order_file_path and os.path.exists(self.order_file_path):
+    #         logging.info(f"Завершаем заказ и создаем файлы для отправки: {self.order_file_path}")
+            
+    #         # Создаем файл для транспортной компании
+    #         shipping_file = self.generate_shipping_filename()
+    #         self.create_shipping_file(self.order_file_path)
+
+    #         # Отправляем файл заказов
+    #         await update.message.reply_document(document=open(self.order_file_path, 'rb'), caption="Вот ваш файл заказов.")
+
+    #         # Отправляем файл для транспортной компании
+    #         await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для отправки товаров.")
+    #     else:
+    #         await update.message.reply_text("Файл заказов не найден.")
