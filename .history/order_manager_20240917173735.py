@@ -203,7 +203,7 @@ class OrderManager:
         df = pd.read_excel(self.loaded_file_path)
         shipping_df = df[['Название товара', 'Количество']]
 
-        shipping_file = self.generate_shipping_filename()
+        shipping_file = self.generate_shipping_file_name()
         shipping_df.to_excel(shipping_file, index=False)
 
         await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для транспортной компании.")

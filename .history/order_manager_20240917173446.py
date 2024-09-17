@@ -116,8 +116,7 @@ class OrderManager:
 
     async def finalize_order(self, update: Update):
         """Завершение режима заказа, создание и отправка файлов orders и shipping."""
-        orders_file = self.loaded_file if self.loaded_file else self.generate_order_filename()
-        shipping_file = self.generate_shipping_filename()
+        orders_file, shipping_file = self.generate_file_names()
 
         if os.path.exists(orders_file):
             await update.message.reply_text("Режим заказа завершен. Отправляем файлы...")
@@ -149,22 +148,23 @@ class OrderManager:
             shipping_df = df[['Название товара', 'Количество']]
 
             # Генерируем имя для файла shipping
-            shipping_file = self.generate_shipping_filename()
+            _, shipping_file = self.generate_file_names()
 
             # Сохраняем в файл shipping.xlsx
             shipping_df.to_excel(shipping_file, index=False)
             logging.info(f"Таблица {shipping_file} успешно создана.")
 
-    def generate_order_filename(self):
-        """Генерация уникального имени для файла заказов."""
+    def generate_file_names(self):
+        """Генерация уникальных имен для файлов заказов и отправки товаров."""
         current_date = datetime.now().strftime('%Y-%m-%d')
-        return f"order_{current_date}.xlsx"
+        orders_file = f"order_{current_date}.xlsx"
+        shipping_file = f"shipping_{current_date}.xlsx"
+        return orders_file, shipping_file
 
-    def generate_shipping_filename(self):
-        """Генерация уникального имени для файла shipping."""
-        current_date = datetime.now().strftime('%Y-%m-%d')
+    def generate_shipping_file_name(self):
+        """Генерация уникального имени файла для ТН (Транспортная накладная)."""
+        current_date = pd.Timestamp.now().strftime('%Y-%m-%d')
         return f"shipping_{current_date}.xlsx"
-
 
     async def process_uploaded_file(self, update: Update, context):
         """Обработка загруженного файла."""
@@ -203,7 +203,7 @@ class OrderManager:
         df = pd.read_excel(self.loaded_file_path)
         shipping_df = df[['Название товара', 'Количество']]
 
-        shipping_file = self.generate_shipping_filename()
+        shipping_file = self.generate_shipping_file_name()
         shipping_df.to_excel(shipping_file, index=False)
 
         await update.message.reply_document(document=open(shipping_file, 'rb'), caption="Вот ваш файл для транспортной компании.")
