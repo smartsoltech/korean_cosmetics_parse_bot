@@ -237,7 +237,7 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.Document.FileExtension("xlsx"), command_logic.handle_uploaded_file))
 
     # Обработка команд в группе
-    application.add_handler(MessageHandler(filters.Command, command_logic.handle_text))
+    application.add_handler(MessageHandler(filters.Command, command_logic.handle_command_in_group))
     application.run_polling()
 
 if __name__ == '__main__':

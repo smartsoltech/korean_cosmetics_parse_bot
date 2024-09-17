@@ -227,17 +227,17 @@ def main() -> None:
     # Обработка текста для заказа
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, command_logic.handle_text))
 
-    # # Обработка текстов и команд
-    # application.add_handler(MessageHandler(filters.Text & ~filters.command, command_logic.handle_text))
+    # Обработка текстов и команд
+    application.add_handler(MessageHandler(filters.text & ~filters.command, command_logic.handle_text))
 
     # Обработка команд (например, команда /start)
     application.add_handler(CommandHandler("start", start))
 
     # Обработка документов (например, файлов .xlsx)
-    application.add_handler(MessageHandler(filters.Document.FileExtension("xlsx"), command_logic.handle_uploaded_file))
+    application.add_handler(MessageHandler(filters.document.file_extension("xlsx"), command_logic.handle_uploaded_file))
 
     # Обработка команд в группе
-    application.add_handler(MessageHandler(filters.Command, command_logic.handle_text))
+    application.add_handler(MessageHandler(filters.command, command_logic.handle_command_in_group))
     application.run_polling()
 
 if __name__ == '__main__':
