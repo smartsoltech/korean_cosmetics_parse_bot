@@ -213,9 +213,9 @@ def main() -> None:
 
     # Команды
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("order", command_logic.start_order))
+    application.add_handler(CommandHandler("заказ", command_logic.start_order))
     application.add_handler(MessageHandler(filters.Regex(r'^цена\s+https?://'), command_logic.handle_price))
-    application.add_handler(MessageHandler(filters.Regex('заказ'), command_logic.start_order))
+
     # Обработка файла
     application.add_handler(MessageHandler(filters.Document.FileExtension("xlsx"), command_logic.handle_uploaded_file))
     

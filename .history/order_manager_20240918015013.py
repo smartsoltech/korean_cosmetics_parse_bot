@@ -389,16 +389,12 @@ class OrderManager:
                 await update.message.reply_text("Не удалось получить данные о товаре. Попробуйте снова.")
 
     def save_order_to_file(self, update: Update):
-        """Сохранение заказа в уже существующий или новый файл."""
+        """Сохранение заказа в уже существующий файл."""
         if not self.order_file_path:
-            self.order_file_path = self.generate_order_file()  # Генерируем файл, если его нет
-        
-        # Проверяем, существует ли файл, если нет - создаем новый DataFrame
-        if not os.path.exists(self.order_file_path):
-            logging.info(f"Файл {self.order_file_path} не существует, создаем новый.")
-            df = pd.DataFrame(columns=['Ссылка', 'Количество', 'Опции', 'Название товара', 'Оригинальная цена', 'Стоимость доставки', 'Продавец'])
-        else:
-            df = pd.read_excel(self.order_file_path)
+            self.order_file_path = self.generate_order_file()
+
+        # Загружаем существующий файл заказа
+        df = pd.read_excel(self.order_file_path)
 
         # Создаем новую запись для таблицы заказов
         new_order = pd.DataFrame([{
@@ -417,7 +413,6 @@ class OrderManager:
         # Сохраняем изменения
         df.to_excel(self.order_file_path, index=False)
         logging.info(f"Заказ успешно добавлен в файл: {self.order_file_path}")
-
 
     def create_shipping_file(self, orders_file):
         """Создание файла shipping.xlsx с колонками 'Название товара' и 'Количество'."""

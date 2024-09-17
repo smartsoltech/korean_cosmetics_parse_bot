@@ -40,14 +40,10 @@ class CommandHandlerLogic:
 
     async def handle_uploaded_file(self, update: Update, context: CallbackContext) -> None:
         """Обработка загруженного файла"""
-        print("handle_uploaded_file called")
-        print("update", update)
-        print("context", context)
         try:
             await self.order_manager.process_uploaded_file(update, context)
         except Exception as e:
             self.logger.error(f"Ошибка при обработке файла: {e}")
-            print(f"Error occurred: {e}")
             await update.message.reply_text("Произошла ошибка при обработке файла.")
 
     async def handle_text(self, update: Update, context: CallbackContext) -> None:
@@ -65,7 +61,7 @@ class CommandHandlerLogic:
                 await update.message.reply_text("Пожалуйста, используйте команду /заказ, чтобы начать добавление.")
         except Exception as e:
             print("error occurred:", e)
-            self.logger.error(f"Ошибка при обработке текста бла бла бла: {e}")
+            self.logger.error(f"Ошибка при обработке текста: {e}")
             await update.message.reply_text("Произошла ошибка при обработке сообщения.")
 
     async def supplement_order(self, update: Update, context: CallbackContext) -> None:
