@@ -10,9 +10,6 @@ RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем watchdog для работы с watchmedo
-RUN pip install watchdog
-
 # Создаем рабочую директорию
 WORKDIR /usr/src/app
 
@@ -22,5 +19,5 @@ COPY . .
 # Устанавливаем зависимости Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Команда по умолчанию для запуска watchmedo
-CMD ["watchmedo", "auto-restart", "--patterns=*.py", "--recursive", "--", "python", "bot.py"]
+# Команда по умолчанию для запуска бота
+CMD ["python", "bot.py"]

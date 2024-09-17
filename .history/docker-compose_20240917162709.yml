@@ -7,8 +7,6 @@ services:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
-    networks:
-      - bot-net
 
   bot:
     build: .
@@ -19,13 +17,4 @@ services:
     volumes:
       - .:/usr/src/app  
       - /usr/src/app/.venv  
-    depends_on:
-      - selenium-chrome
-    environment:
-      - SELENIUM_URL=http://selenium-chrome:4444/wd/hub
-    networks:
-      - bot-net
-    command: watchmedo auto-restart --patterns="*.py" --recursive -- python bot.py
-
-networks:
-  bot-net:
+    command: watchmedo auto-restart --patterns="*.py" --recursive -- python bot.py  

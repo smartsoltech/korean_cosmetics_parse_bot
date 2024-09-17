@@ -32,8 +32,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Клавиатура для заказов и файлов
-order_keyboard = ReplyKeyboardMarkup([['нет', 'конец']], one_time_keyboard=True, resize_keyboard=True)
-file_options_keyboard = ReplyKeyboardMarkup([['Дополнить заказ', 'Сформировать ТН', 'Посчитать стоимость']], one_time_keyboard=True, resize_keyboard=True)
+order_keyboard = ReplyKeyboardMarkup([['нет', 'конец']], one_time_keyboard=False, resize_keyboard=True)
+file_options_keyboard = ReplyKeyboardMarkup([['Дополнить заказ', 'Сформировать ТН', 'Посчитать стоимость']], one_time_keyboard=False, resize_keyboard=True)
 
 # Инициализация управления заказами и командной логики
 order_manager = OrderManager(order_keyboard, file_options_keyboard)

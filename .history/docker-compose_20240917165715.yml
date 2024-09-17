@@ -7,9 +7,10 @@ services:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
-    networks:
-      - bot-net
-
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=
+      - OTEL_TRACES_EXPORTER=none
+      - OTEL_METRICS_EXPORTER=none
   bot:
     build: .
     container_name: telegram_bot
@@ -23,9 +24,4 @@ services:
       - selenium-chrome
     environment:
       - SELENIUM_URL=http://selenium-chrome:4444/wd/hub
-    networks:
-      - bot-net
-    command: watchmedo auto-restart --patterns="*.py" --recursive -- python bot.py
-
-networks:
-  bot-net:
+    command: watchmedo auto-restart --patterns="*.py" --recursive -- python bot.py  
