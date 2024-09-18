@@ -1,63 +1,55 @@
-import logging
 import os
+import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from tenacity import retry, stop_after_attempt, wait_fixed
-from dotenv import load_dotenv  # Добавляем библиотеку для загрузки .env файла
+from selenium.common.exceptions import WebDriverException
 
 # Настраиваем логирование
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Загружаем переменные из .env файла
-load_dotenv()
 
 class Parser:
     def __init__(self, url: str):
         self.url = url
         self.driver = None
         self.setup_driver()
-        self.driver = webdriver.Remote(
-   
-)
+
     def setup_driver(self):
         """Настройка драйвера для подключения к Selenium, запущенному в Docker-контейнере"""
-        logger.info("Настройка удаленного WebDriver для подключения к контейнеру")
-        
-        selenium_url = os.getenv("SELENIUM_URL")  # Загружаем URL Selenium из .env
-        chrome_options = webdriver.ChromeOptions()
-        
-        command_executor=selenium_url,
-        options=chrome_options,
-        keep_alive=True,  # Оставляем соединение открытым
-        
-        timeout=30  # Увеличьте время ожидания
-        
-        # Получаем опции для Chrome из переменных окружения
-        chrome_options.add_argument(os.getenv("CHROME_NO_SANDBOX", "--no-sandbox"))
-        chrome_options.add_argument(os.getenv("CHROME_DISABLE_DEV_SHM", "--disable-dev-shm-usage"))
-        
-        self.driver = webdriver.Remote(command_executor=selenium_url, options=chrome_options)
-
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
-    def fetch_page(self):
-        """Имитируем заход на страницу через браузер и загружаем её"""
         try:
-            logger.info(f"Открытие страницы: {self.url}")
-            self.driver.get(self.url)
+            logger.info("Настройка удаленного WebDriver для подключения к контейнеру")
+            selenium_url = os.getenv("SELENIUM_URL")  # Загружаем URL Selenium из .env
+            chrome_options = webdriver.ChromeOptions()
 
-            # Ожидание, пока страница полностью загрузится
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "prod-buy-header"))
+            # Получаем опции для Chrome из переменных окружения
+            chrome_options.add_argument(os.getenv("CHROME_NO_SANDBOX", "--no-sandbox"))
+            chrome_options.add_argument(os.getenv("CHROME_DISABLE_DEV_SHM", "--disable-dev-shm-usage"))
+
+            # Устанавливаем соединение с Selenium
+            self.driver = webdriver.Remote(
+                command_executor=selenium_url,
+                options=chrome_options,
+                keep_alive=True  # Оставляем соединение открытым
             )
-            logger.info("Страница успешно загружена")
-
+        except WebDriverException as e:
+            logger.error(f"Ошибка при настройке WebDriver: {e}")
         except Exception as e:
+            logger.error(f"Неизвестная ошибка при настройке WebDriver: {e}")
+        finally:
+            if self.driver:
+                logger.info("WebDriver успешно настроен")
+            else:
+                logger.warning("WebDriver не был настроен")
+
+    def fetch_page(self):
+        """Метод для загрузки страницы"""
+        try:
+            logger.info(f"Загрузка страницы: {self.url}")
+            self.driver.get(self.url)
+        except WebDriverException as e:
             logger.error(f"Ошибка при загрузке страницы: {e}")
-            self.driver.quit()
-            return None
+        finally:
+            if self.driver:
+                logger.info("Операция с WebDriver завершена")
 
     def parse_product_info(self):
         """Парсинг страницы и извлечение данных о товаре"""
