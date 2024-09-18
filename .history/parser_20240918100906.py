@@ -32,9 +32,7 @@ class Parser:
         command_executor=selenium_url,
         options=chrome_options,
         keep_alive=True,  # Оставляем соединение открытым
-        
         timeout=30  # Увеличьте время ожидания
-        
         # Получаем опции для Chrome из переменных окружения
         chrome_options.add_argument(os.getenv("CHROME_NO_SANDBOX", "--no-sandbox"))
         chrome_options.add_argument(os.getenv("CHROME_DISABLE_DEV_SHM", "--disable-dev-shm-usage"))

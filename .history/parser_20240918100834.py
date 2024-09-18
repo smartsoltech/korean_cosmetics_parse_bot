@@ -20,7 +20,10 @@ class Parser:
         self.driver = None
         self.setup_driver()
         self.driver = webdriver.Remote(
-   
+        command_executor=selenium_url,
+        options=chrome_options,
+        keep_alive=True,  # Оставляем соединение открытым
+        timeout=30  # Увеличьте время ожидания
 )
     def setup_driver(self):
         """Настройка драйвера для подключения к Selenium, запущенному в Docker-контейнере"""
@@ -28,12 +31,6 @@ class Parser:
         
         selenium_url = os.getenv("SELENIUM_URL")  # Загружаем URL Selenium из .env
         chrome_options = webdriver.ChromeOptions()
-        
-        command_executor=selenium_url,
-        options=chrome_options,
-        keep_alive=True,  # Оставляем соединение открытым
-        
-        timeout=30  # Увеличьте время ожидания
         
         # Получаем опции для Chrome из переменных окружения
         chrome_options.add_argument(os.getenv("CHROME_NO_SANDBOX", "--no-sandbox"))

@@ -8,8 +8,6 @@ services:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
-    networks:
-      - selenium_net
 
   bot:
     build: .
@@ -27,8 +25,7 @@ services:
       - CHROME_NO_SANDBOX=${CHROME_NO_SANDBOX}
       - CHROME_DISABLE_DEV_SHM=${CHROME_DISABLE_DEV_SHM}
     command: watchmedo auto-restart --patterns="*.py" --recursive -- python bot.py
-    networks:
-      - selenium_net
+    
 networks:
   selenium_net:
     driver: bridge
