@@ -91,4 +91,10 @@ class CommandHandlerLogic:
         except Exception as e:
             self.logger.error(f"Ошибка при подсчете общей стоимости: {e}")
             await update.message.reply_text("Произошла ошибка при подсчете стоимости.")
-        
+            
+    # async def handle_text(self, update: Update, context: CallbackContext) -> None:
+    #     """Обработка текстовых сообщений в группе"""
+    #     if update.message.chat.type in ['group', 'supergroup']:
+    #         await update.message.reply_text(f"Сообщение в группе: {update.message.text}")
+    #     else:
+    #         await self.handle_text(update, context)
