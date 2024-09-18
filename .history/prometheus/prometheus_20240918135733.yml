@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s  # Интервал сбора метрик
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'docker_services'  # Название задачи для мониторинга Docker-сервисов
+    static_configs:
+      - targets: ['selenium:4444', 'grafana:3000']

@@ -23,7 +23,18 @@ REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing requ
 REQUEST_COUNT = Counter('request_count', 'Total requests processed')
 PARSING_STATUS = Gauge('parsing_status', 'Current parsing status')
 
+def process_request():
+    """Function to process a request."""
+    REQUEST_COUNT.inc()  # Увеличиваем счетчик запросов
+    with REQUEST_TIME.time():
+        time.sleep(2)  # Симуляция времени запроса
 
+if __name__ == '__main__':
+    start_http_server(5000)  # Запускаем сервер для метрик
+    while True:
+        process_request()
+        PARSING_STATUS.set(1)  # Выставляем статус процесса парсинга
+        time.sleep(5)
 # Load environment variables from .env file
 load_dotenv()
 
@@ -80,16 +91,5 @@ def main() -> None:
 
     application.run_polling()
 
-def process_request():
-    """Function to process a request."""
-    REQUEST_COUNT.inc()  # Увеличиваем счетчик запросов
-    with REQUEST_TIME.time():
-        time.sleep(2)  # Симуляция времени запроса
-
 if __name__ == '__main__':
-    start_http_server(5000)  # Запускаем сервер для метрик
-    while True:
-        main()
-        process_request()
-        PARSING_STATUS.set(1)  # Выставляем статус процесса парсинга
-        time.sleep(5)  
+    main()

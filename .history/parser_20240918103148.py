@@ -2,6 +2,7 @@ import os
 import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+
 from selenium.common.exceptions import WebDriverException
 
 # Настраиваем логирование
@@ -138,102 +139,3 @@ class Parser:
             logger.error(f"Ошибка при парсинге страницы: {e}")
             self.driver.quit()
             return None
-
-# import json
-# import time
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.remote.webdriver import WebDriver
-
-# class Parser:
-#     def __init__(self, driver: WebDriver):
-#         self.driver = driver
-
-#     def log_parsing_step(self, step, description, execution_time, status):
-#         """ Логирование данных о процессе парсинга в JSON файл """
-#         data = {
-#             'step': step,
-#             'description': description,
-#             'execution_time': execution_time,
-#             'status': status
-#         }
-
-#         # Чтение текущих данных из JSON файла
-#         try:
-#             with open('parsing_data.json', 'r') as f:
-#                 current_data = json.load(f)
-#         except FileNotFoundError:
-#             current_data = []
-
-#         # Добавление новой записи
-#         current_data.append(data)
-
-#         # Запись обновленных данных обратно в JSON файл
-#         with open('parsing_data.json', 'w') as f:
-#             json.dump(current_data, f, ensure_ascii=False, indent=4)
-
-#     def parse_product_info(self):
-#         """ Основной метод парсинга страницы товара с мониторингом процесса """
-#         try:
-#             # Парсинг названия товара
-#             start_time = time.time()
-#             step = "Получение названия товара"
-#             try:
-#                 product_name = self.driver.find_element(By.CLASS_NAME, "prod-buy-header__title").text
-#                 self.log_parsing_step(step, f"Название товара: {product_name}", time.time() - start_time, "Успешно")
-#             except Exception as e:
-#                 self.log_parsing_step(step, str(e), time.time() - start_time, "Ошибка")
-#                 product_name = None
-
-#             # Парсинг цены товара
-#             start_time = time.time()
-#             step = "Получение цены товара"
-#             try:
-#                 product_price = self.driver.find_element(By.CLASS_NAME, "total-price").text
-#                 self.log_parsing_step(step, f"Цена товара: {product_price}", time.time() - start_time, "Успешно")
-#             except Exception as e:
-#                 self.log_parsing_step(step, str(e), time.time() - start_time, "Ошибка")
-#                 product_price = None
-
-#             # Парсинг информации о доставке
-#             start_time = time.time()
-#             step = "Получение информации о доставке"
-#             try:
-#                 shipping_info = self.driver.find_element(By.CLASS_NAME, "shipping-fee-txt").text
-#                 self.log_parsing_step(step, f"Информация о доставке: {shipping_info}", time.time() - start_time, "Успешно")
-#             except Exception as e:
-#                 self.log_parsing_step(step, str(e), time.time() - start_time, "Ошибка")
-#                 shipping_info = None
-
-#             # Парсинг рейтинга товара
-#             start_time = time.time()
-#             step = "Получение рейтинга товара"
-#             try:
-#                 product_rating = self.driver.find_element(By.CLASS_NAME, "rds-rating-score").text
-#                 self.log_parsing_step(step, f"Рейтинг товара: {product_rating}", time.time() - start_time, "Успешно")
-#             except Exception as e:
-#                 self.log_parsing_step(step, str(e), time.time() - start_time, "Ошибка")
-#                 product_rating = None
-
-#             # Парсинг количества отзывов
-#             start_time = time.time()
-#             step = "Получение количества отзывов"
-#             try:
-#                 reviews_count = self.driver.find_element(By.CLASS_NAME, "count").text
-#                 self.log_parsing_step(step, f"Количество отзывов: {reviews_count}", time.time() - start_time, "Успешно")
-#             except Exception as e:
-#                 self.log_parsing_step(step, str(e), time.time() - start_time, "Ошибка")
-#                 reviews_count = None
-
-#             # Возвращаем собранные данные
-#             return {
-#                 'Название товара': product_name,
-#                 'Цена': product_price,
-#                 'Доставка': shipping_info,
-#                 'Рейтинг': product_rating,
-#                 'Отзывы': reviews_count
-#             }
-
-#         except Exception as e:
-#             # Логирование общей ошибки, если что-то пошло не так
-#             self.log_parsing_step("Парсинг страницы", str(e), 0, "Ошибка")
-#             return None

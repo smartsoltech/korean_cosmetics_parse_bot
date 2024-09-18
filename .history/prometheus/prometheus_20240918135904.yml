@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s  # Интервал сбора метрик
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'docker_services'  # Название задачи для мониторинга Docker-сервисов
+    static_configs:
+      - targets: ['127.0.0.1:4444', '127.0.0.1:3000', '127.0.0.1:5000', '127.0.0.1:5050']

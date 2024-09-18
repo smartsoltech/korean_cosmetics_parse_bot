@@ -38,4 +38,4 @@ yarl==1.9.4
 selenium
 tenacity
 watchdog
-prometheus_client
+rometheus_client
