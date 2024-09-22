@@ -41,6 +41,46 @@ def parse_proxies_from_html(html_content):
 
     return proxies
 
+def fetch_proxies_from_api(api_url):
+    """Функция для получения списка прокси с API"""
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()
+        data = response.json()
+
+        proxies = []
+        for proxy_data in data['data']:
+            ip = proxy_data['ip']
+            port = proxy_data['port']
+            https = proxy_data['protocols'] and 'https' in proxy_data['protocols']
+
+            proxy = f"{ip}:{port}"
+            proxies.append({
+                "proxy": proxy,
+                "https": https
+            })
+
+        return proxies
+    except Exception as e:
+        print(f"Ошибка при запросе к API: {e}")
+        return []
+
+def check_proxy(proxy, https):
+    """Проверяет, доступен ли прокси"""
+    proxies = {
+        "http": f"http://{proxy}",
+        "https": f"https://{proxy}" if https else f"http://{proxy}"
+    }
+    try:
+        # Отправляем запрос на Google для проверки прокси
+        response = requests.get('https://www.coupang.com', proxies=proxies, timeout=5)
+        if response.status_code == 200:
+            print(f"Прокси {proxy} работает.")
+            return True
+    except requests.RequestException:
+        print(f"Прокси {proxy} не работает.")
+    return False
+
 def save_proxies_to_file(proxies, filename="proxies.txt"):
     """Сохраняет список прокси в файл"""
     with open(filename, 'w') as file:
@@ -48,16 +88,26 @@ def save_proxies_to_file(proxies, filename="proxies.txt"):
             proxy_line = proxy["proxy"] + (" (HTTPS)" if proxy["https"] else "")
             file.write(proxy_line + "\n")
 
-# Пример использования
+# Пример использования для HTML-страницы
 url = 'https://free-proxy-list.net/#list'  # Реальная страница с прокси-серверами
 html_content = fetch_proxies_from_webpage(url)  # Получаем HTML-контент
 
-# Парсим HTML для получения списка прокси
+# # Парсим HTML для получения списка прокси
 proxies = parse_proxies_from_html(html_content)
 
-# Сохраняем прокси в файл
-save_proxies_to_file(proxies)
+# Пример использования для API
+api_url = 'https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc'
+api_proxies = fetch_proxies_from_api(api_url)
 
-print(f"Найдено {len(proxies)} прокси.")
-for proxy in proxies:
-    print(f"Прокси: {proxy['proxy']}")
+# Объединяем прокси из обоих источников
+all_proxies = proxies + api_proxies
+
+# Фильтруем только рабочие прокси
+working_proxies = [proxy for proxy in all_proxies if check_proxy(proxy["proxy"], proxy["https"])]
+
+# Сохраняем рабочие прокси в файл
+save_proxies_to_file(working_proxies)
+
+print(f"Найдено {len(working_proxies)} рабочих прокси.")
+for proxy in working_proxies:
+    print(f"Рабочий прокси: {proxy['proxy']}")

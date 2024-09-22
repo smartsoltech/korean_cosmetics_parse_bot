@@ -16,13 +16,7 @@ from dotenv import load_dotenv
 from command_handler import CommandHandlerLogic
 from order_manager import OrderManager
 from file_watcher import start_watchdog
-from prometheus_client import start_http_server, Summary, Counter, Gauge
 import time
-
-REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
-REQUEST_COUNT = Counter('request_count', 'Total requests processed')
-PARSING_STATUS = Gauge('parsing_status', 'Current parsing status')
-
 
 # Load environment variables from .env file
 load_dotenv()
@@ -70,6 +64,9 @@ def main() -> None:
     # Обработка файла
     application.add_handler(MessageHandler(filters.Document.FileExtension("xlsx"), command_logic.handle_uploaded_file))
     
+    application.add_handler(CommandHandler('manual_input', order_manager.manual_input_mode))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, order_manager.handle_manual_input))
+
     # Обработка кнопок действий
     application.add_handler(MessageHandler(filters.Regex('Дополнить заказ'), order_manager.supplement_order))
     application.add_handler(MessageHandler(filters.Regex('Сформировать ТН'), lambda update, context: order_manager.generate_shipping_file(update, context)))  # Исправлено
