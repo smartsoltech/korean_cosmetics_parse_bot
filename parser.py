@@ -20,10 +20,15 @@ class Parser:
         try:
             logging.info("Настройка удаленного WebDriver для подключения к контейнеру")
             chrome_options = Options()
-
+            chrome_options = Options()
             # Добавляем настройки браузера
             chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
             chrome_options.add_argument("window-size=1920,1080")
+            chrome_options.add_argument("--disable-dev-shm-usage")  # Отключение shared memory
+            chrome_options.add_argument("--no-sandbox")  # Отключение sandbox режима
+            chrome_options.add_argument("--disable-gpu")  # Отключение GPU ускорения (опционально)
+            chrome_options.add_argument("--headless")  # Использование headless режима
+    
 
             if self.proxy:
                 chrome_options.add_argument(f"--proxy-server={self.proxy}")
@@ -31,7 +36,7 @@ class Parser:
 
             # Устанавливаем соединение с Selenium
             self.driver = webdriver.Remote(
-                command_executor='http://selenium:4444/wd/hub',
+                command_executor='http://selenium-hub:4444/wd/hub',
                 options=chrome_options
             )
             logging.info("WebDriver успешно настроен")

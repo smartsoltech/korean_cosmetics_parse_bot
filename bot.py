@@ -65,7 +65,7 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.Document.FileExtension("xlsx"), command_logic.handle_uploaded_file))
     
     application.add_handler(CommandHandler('manual_input', order_manager.manual_input_mode))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, order_manager.handle_manual_input))
+    application.add_handler(MessageHandler(filters.Regex('ручной ввод'), order_manager.handle_manual_input))
 
     # Обработка кнопок действий
     application.add_handler(MessageHandler(filters.Regex('Дополнить заказ'), order_manager.supplement_order))

@@ -4,6 +4,8 @@ FROM python:3.10-slim
 # Устанавливаем зависимости системы
 RUN apt-get update && apt-get install -y \
     build-essential \
+    net-tools\
+    curl\
     libssl-dev \
     libffi-dev \
     python3-dev \
