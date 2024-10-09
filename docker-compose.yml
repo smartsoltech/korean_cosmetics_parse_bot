@@ -1,54 +1,14 @@
 version: '3.8'
 
 services:
-  selenium-hub:
-    image: selenium/hub:4.5.0
-    container_name: selenium-hub
-    ports:
-      - "4444:4444"
-    environment:
-      - SE_GRID_MAX_SESSION=5
-    networks:
-      - bot-network
-
-  selenium-chrome:
-    image: selenium/node-chrome:4.5.0
-    container_name: selenium-chrome
-    deploy:
-      resources:
-        limits:
-          memory: 1g
-          cpus: '1'
-    depends_on:
-      - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - JAVA_OPTS=-Dotel.java.global-autoconfigure.enabled=false
-      - VNC_NO_PASSWORD=false
-    networks:
-      - bot-network
-    ports:
-      - "7900:7900"  # VNC доступ для отладки, можно отключить
-
   telegram_bot:
     build: .
     container_name: telegram_bot
     restart: always
-    depends_on:
-      - selenium-hub
-      - selenium-chrome
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
-      - SELENIUM_URL=http://selenium-hub:4444
-    networks:
-      - bot-network
     volumes:
       - ./logs:/usr/src/app/logs
       - ./income:/usr/src/app/income
       - ./outcome:/usr/src/app/outcome
 
-networks:
-  bot-network:
-    driver: bridge
